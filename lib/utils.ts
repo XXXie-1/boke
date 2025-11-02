@@ -1,7 +1,13 @@
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import slugify from 'slugify'
 import { nanoid } from 'nanoid'
 import { generateJSON } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 // Slug generation
 export const generateSlug = (text: string, existingSlugs: string[] = []): string => {

@@ -1,65 +1,257 @@
+'use client'
+
+import * as React from 'react'
+import { Container } from '@/components/ui/container'
+import { Button } from '@/components/ui/Button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Prose } from '@/components/ui/prose'
+import { Header, Footer } from '@/components'
+import { Moon, Sun, Zap, Shield, Sparkles } from 'lucide-react'
+
 export default function Home() {
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1">
+          <Container className="py-12">
+            <div className="space-y-8">
+              <div className="text-center space-y-4">
+                <Skeleton className="h-12 w-3/4 mx-auto" />
+                <Skeleton className="h-6 w-1/2 mx-auto" />
+              </div>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i}>
+                    <CardHeader>
+                      <Skeleton className="h-6 w-3/4" />
+                    </CardHeader>
+                    <CardContent>
+                      <Skeleton className="h-4 w-full mb-2" />
+                      <Skeleton className="h-4 w-2/3" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </Container>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Welcome to Next.js 14 with TypeScript and Tailwind CSS
-        </p>
+    <>
+      <Header />
+      <div className="flex-1">
+        {/* Hero Section */}
+        <section className="py-20 bg-gradient-to-br from-background to-muted/20">
+          <Container>
+            <div className="text-center space-y-6 max-w-4xl mx-auto">
+              <Badge variant="secondary" className="mb-4">
+                <Sparkles className="w-3 h-3 mr-1" />
+                Design System v1.0
+              </Badge>
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-balance">
+                Minimalist Design System
+              </h1>
+              <p className="text-xl text-muted-foreground text-pretty max-w-2xl mx-auto">
+                A Claude-inspired design system built with Next.js, TypeScript,
+                and Tailwind CSS. Featuring dark mode support, accessible
+                components, and fluid typography.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <Button size="lg" className="gap-2">
+                  <Zap className="w-4 h-4" />
+                  Get Started
+                </Button>
+                <Button variant="outline" size="lg">
+                  View Components
+                </Button>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-20">
+          <Container>
+            <div className="text-center space-y-4 mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                Key Features
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Built with accessibility and performance in mind
+              </p>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <Card className="relative overflow-hidden">
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Moon className="w-5 h-5 text-primary" />
+                    </div>
+                    <CardTitle>Dark Mode</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Seamless dark/light theme switching with system preference
+                    detection and persistence.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="relative overflow-hidden">
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Shield className="w-5 h-5 text-primary" />
+                    </div>
+                    <CardTitle>Accessible</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    WCAG AA compliant components with proper focus management
+                    and keyboard navigation.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="relative overflow-hidden">
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                    </div>
+                    <CardTitle>Responsive</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Mobile-first design with fluid typography and adaptive
+                    layouts for all screen sizes.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </div>
+          </Container>
+        </section>
+
+        {/* Typography Section */}
+        <section className="py-20 bg-muted/20">
+          <Container>
+            <div className="text-center space-y-4 mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                Typography System
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Fluid typography with optimal readability
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              <Prose>
+                <h1>Heading 1</h1>
+                <p>
+                  This is a paragraph of text. The design system uses Inter font
+                  for optimal readability across all devices. Text is balanced
+                  and pretty for better reading experience.
+                </p>
+
+                <h2>Heading 2</h2>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </p>
+
+                <h3>Heading 3</h3>
+                <p>
+                  <code>Inline code</code> elements are styled for clarity.
+                  Links are
+                  <a href="#">underlined with hover effects</a> for better
+                  accessibility.
+                </p>
+
+                <blockquote>
+                  "Design is not just what it looks like and feels like. Design
+                  is how it works."
+                </blockquote>
+              </Prose>
+            </div>
+          </Container>
+        </section>
+
+        {/* Components Showcase */}
+        <section className="py-20">
+          <Container>
+            <div className="text-center space-y-4 mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                Component Library
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Reusable components built with accessibility in mind
+              </p>
+            </div>
+
+            <div className="space-y-12 max-w-4xl mx-auto">
+              {/* Buttons */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold">Buttons</h3>
+                <div className="flex flex-wrap gap-4">
+                  <Button>Default</Button>
+                  <Button variant="secondary">Secondary</Button>
+                  <Button variant="outline">Outline</Button>
+                  <Button variant="ghost">Ghost</Button>
+                  <Button variant="destructive">Destructive</Button>
+                </div>
+              </div>
+
+              {/* Badges */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold">Badges</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Badge>Default</Badge>
+                  <Badge variant="secondary">Secondary</Badge>
+                  <Badge variant="outline">Outline</Badge>
+                  <Badge variant="destructive">Destructive</Badge>
+                </div>
+              </div>
+
+              {/* Loading States */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold">Loading States</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <Skeleton className="h-12 w-12 rounded-lg" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-1/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                </div>
+              </div>
+            </div>
+          </Container>
+        </section>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <h1 className="text-4xl font-bold text-primary-600">Hello, World!</h1>
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
-          <h2 className="mb-3 text-2xl font-semibold">
-            Documentation{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </div>
-
-        <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js by interacting with an interactive course.
-          </p>
-        </div>
-
-        <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore the Next.js 13 playground and create your own project.
-          </p>
-        </div>
-
-        <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </div>
-      </div>
-    </main>
+      <Footer />
+    </>
   )
 }
