@@ -1,12 +1,18 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
+import { ThemeProvider } from '@/components/theme-provider'
+import { ErrorBoundary } from '@/components'
+import { Header, Footer } from '@/components'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'Next.js App',
-  description: 'A modern Next.js application with TypeScript and Tailwind CSS',
+  title: 'Design System',
+  description: 'A modern design system built with Next.js and Tailwind CSS',
 }
 
 export default function RootLayout({
@@ -15,8 +21,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ErrorBoundary>
+            <div className="min-h-screen flex flex-col">{children}</div>
+          </ErrorBoundary>
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
