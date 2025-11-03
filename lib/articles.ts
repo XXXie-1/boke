@@ -16,7 +16,7 @@ import {
   CategoryInputSchema,
   CommentInputSchema
 } from './schemas'
-import { generateSlug, calculateReadTime, extractPlainText, validateTiptapJSON, calculatePagination } from './utils'
+import { generateSlug, calculateReadTime, calculateReadTimeFromTiptapJSON, extractPlainText, validateTiptapJSON, calculatePagination } from './utils'
 
 // Get Supabase client
 const getSupabaseClient = () => createSupabaseServerClient()
@@ -153,8 +153,7 @@ export const articlesService = {
     }
 
     // Calculate read time
-    const plainText = extractPlainText(input.content)
-    const readTime = calculateReadTime(plainText)
+    const readTime = calculateReadTimeFromTiptapJSON(input.content)
 
     // Validate content
     if (!validateTiptapJSON(input.content)) {
@@ -207,8 +206,7 @@ export const articlesService = {
         throw new Error('Invalid content format')
       }
       
-      const plainText = extractPlainText(input.content)
-      updateData.read_time_minutes = calculateReadTime(plainText)
+      updateData.read_time_minutes = calculateReadTimeFromTiptapJSON(input.content)
     }
 
     // Generate new slug if title changed and no slug provided

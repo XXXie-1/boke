@@ -33,6 +33,14 @@ export const calculateReadTime = (content: string): number => {
   return Math.max(1, readTime) // Minimum 1 minute
 }
 
+// Read time calculation for Tiptap JSON content
+export const calculateReadTimeFromTiptapJSON = (json: any): number => {
+  const plainText = extractPlainText(json)
+  const wordCount = plainText.trim().split(/\s+/).filter(word => word.length > 0).length
+  const readTime = Math.ceil(wordCount / 200)
+  return Math.max(1, readTime) // Minimum 1 minute
+}
+
 // Tiptap JSON serialization
 export const markdownToTiptapJSON = (markdown: string) => {
   const extensions = [
@@ -50,6 +58,8 @@ export const tiptapJSONToMarkdown = (json: any): string => {
   }
   return ''
 }
+
+// The calculateReadTimeFromTiptapJSON function is already exported above
 
 const extractTextFromJSON = (node: any): string => {
   if (node.type === 'text') {
