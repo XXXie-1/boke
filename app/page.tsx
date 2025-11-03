@@ -74,9 +74,11 @@ export default function Home() {
                 components, and fluid typography.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button size="lg" className="gap-2">
-                  <Zap className="w-4 h-4" />
-                  Get Started
+                <Button size="lg" className="gap-2" asChild>
+                  <a href="/articles">
+                    <Zap className="w-4 h-4" />
+                    Read Articles
+                  </a>
                 </Button>
                 <Button variant="outline" size="lg">
                   View Components

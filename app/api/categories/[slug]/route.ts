@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { categoriesService } from '@/lib/articles'
+import { mockService } from '@/lib/mock-service'
 
 // GET /api/categories/[slug] - Get category by slug
 export async function GET(
@@ -16,7 +17,11 @@ export async function GET(
       )
     }
 
-    const category = await categoriesService.getCategoryBySlug(slug)
+    // Use mock service if Supabase is not configured
+    const useMockService = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const category = useMockService 
+      ? await mockService.getCategoryBySlug(slug)
+      : await categoriesService.getCategoryBySlug(slug)
 
     const response = NextResponse.json({ data: category })
     response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200')

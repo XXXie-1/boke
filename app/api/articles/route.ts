@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { articlesService } from '@/lib/articles'
+import { mockService } from '@/lib/mock-service'
 import { ArticleQuerySchema, ArticleInputSchema } from '@/lib/schemas'
 import { z } from 'zod'
 
@@ -21,7 +22,11 @@ export async function GET(request: NextRequest) {
       sort_order: searchParams.get('sort_order') || 'desc',
     })
 
-    const result = await articlesService.getArticles(query)
+    // Use mock service if Supabase is not configured
+    const useMockService = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const result = useMockService 
+      ? await mockService.getArticles(query)
+      : await articlesService.getArticles(query)
 
     // Cache response for 5 minutes
     const response = NextResponse.json({

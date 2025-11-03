@@ -19,7 +19,12 @@ import {
 import { generateSlug, calculateReadTime, extractPlainText, validateTiptapJSON, calculatePagination } from './utils'
 
 // Get Supabase client
-const getSupabaseClient = () => createSupabaseServerClient()
+const getSupabaseClient = () => {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('Supabase configuration is missing')
+  }
+  return createSupabaseServerClient()
+}
 
 // Articles CRUD operations
 export const articlesService = {

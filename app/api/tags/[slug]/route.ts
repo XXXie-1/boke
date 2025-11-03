@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { tagsService } from '@/lib/articles'
+import { mockService } from '@/lib/mock-service'
 
 // GET /api/tags/[slug] - Get single tag by slug
 export async function GET(
@@ -16,7 +17,11 @@ export async function GET(
       )
     }
 
-    const tag = await tagsService.getTagBySlug(slug)
+    // Use mock service if Supabase is not configured
+    const useMockService = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const tag = useMockService 
+      ? await mockService.getTagBySlug(slug)
+      : await tagsService.getTagBySlug(slug)
 
     // Cache response for 1 hour
     const response = NextResponse.json({ data: tag })
