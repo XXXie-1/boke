@@ -11,10 +11,7 @@ export async function POST(
     const { slug } = params
 
     if (!slug) {
-      return NextResponse.json(
-        { error: 'Slug is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
     }
 
     // First get the article by slug to get the ID
@@ -24,25 +21,25 @@ export async function POST(
     const result = await articlesService.incrementViewCount(article.id)
 
     // Cache response for 5 minutes (view counts don't need to be perfectly fresh)
-    const response = NextResponse.json({ 
-      data: { 
+    const response = NextResponse.json({
+      data: {
         article_id: article.id,
-        view_count: result.view_count 
-      }
+        view_count: result.view_count,
+      },
     })
-    
-    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+
+    response.headers.set(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
     response.headers.set('Cache-Tag', `article:${slug},article-views`)
 
     return response
   } catch (error) {
     console.error('Error incrementing view count:', error)
-    
+
     if (error instanceof Error && error.message === 'Article not found') {
-      return NextResponse.json(
-        { error: 'Article not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
     return NextResponse.json(

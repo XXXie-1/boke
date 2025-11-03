@@ -39,7 +39,10 @@ export interface Database {
           created_at: string
           updated_at: string
         }
-        Insert: Omit<Database['public']['Tables']['articles']['Row'], 'id' | 'created_at' | 'updated_at' | 'view_count'>
+        Insert: Omit<
+          Database['public']['Tables']['articles']['Row'],
+          'id' | 'created_at' | 'updated_at' | 'view_count'
+        >
         Update: Partial<Database['public']['Tables']['articles']['Row']>
       }
       tags: {
@@ -51,7 +54,10 @@ export interface Database {
           created_at: string
           updated_at: string
         }
-        Insert: Omit<Database['public']['Tables']['tags']['Row'], 'id' | 'created_at' | 'updated_at'>
+        Insert: Omit<
+          Database['public']['Tables']['tags']['Row'],
+          'id' | 'created_at' | 'updated_at'
+        >
         Update: Partial<Database['public']['Tables']['tags']['Row']>
       }
       categories: {
@@ -64,21 +70,29 @@ export interface Database {
           created_at: string
           updated_at: string
         }
-        Insert: Omit<Database['public']['Tables']['categories']['Row'], 'id' | 'created_at' | 'updated_at'>
+        Insert: Omit<
+          Database['public']['Tables']['categories']['Row'],
+          'id' | 'created_at' | 'updated_at'
+        >
         Update: Partial<Database['public']['Tables']['categories']['Row']>
       }
       comments: {
         Row: {
           id: string
           article_id: string
-          author_id: string
+          nickname: string
           content: string
+          ip_hash: string
           parent_id?: string
           status: 'pending' | 'approved' | 'rejected'
+          moderation_reason?: string
           created_at: string
           updated_at: string
         }
-        Insert: Omit<Database['public']['Tables']['comments']['Row'], 'id' | 'created_at' | 'updated_at'>
+        Insert: Omit<
+          Database['public']['Tables']['comments']['Row'],
+          'id' | 'created_at' | 'updated_at'
+        >
         Update: Partial<Database['public']['Tables']['comments']['Row']>
       }
       article_tags: {
@@ -95,7 +109,9 @@ export interface Database {
           category_id: string
         }
         Insert: Database['public']['Tables']['article_categories']['Row']
-        Update: Partial<Database['public']['Tables']['article_categories']['Row']>
+        Update: Partial<
+          Database['public']['Tables']['article_categories']['Row']
+        >
       }
     }
     Views: {

@@ -1,5 +1,14 @@
-import { createSupabaseServerClient, Article, ArticleInsert, ArticleUpdate, Tag, Category, Comment, ArticleStats } from './supabase'
-import { 
+import {
+  createSupabaseServerClient,
+  Article,
+  ArticleInsert,
+  ArticleUpdate,
+  Tag,
+  Category,
+  Comment,
+  ArticleStats,
+} from './supabase'
+import {
   ArticleQuery,
   ArticleInput,
   ArticleUpdateInput,
@@ -14,9 +23,15 @@ import {
   ArticleQuerySchema,
   TagInputSchema,
   CategoryInputSchema,
-  CommentInputSchema
+  CommentInputSchema,
 } from './schemas'
-import { generateSlug, calculateReadTime, extractPlainText, validateTiptapJSON, calculatePagination } from './utils'
+import {
+  generateSlug,
+  calculateReadTime,
+  extractPlainText,
+  validateTiptapJSON,
+  calculatePagination,
+} from './utils'
 
 // Get Supabase client
 const getSupabaseClient = () => createSupabaseServerClient()
@@ -26,40 +41,57 @@ export const articlesService = {
   // Get all articles with pagination and filtering
   async getArticles(query: ArticleQuery) {
     const supabase = getSupabaseClient()
-    const { page, limit, status, author_id, tag, category, search, sort_by, sort_order } = query
-    
-    let queryBuilder = supabase
-      .from('articles')
-      .select(`
+    const {
+      page,
+      limit,
+      status,
+      author_id,
+      tag,
+      category,
+      search,
+      sort_by,
+      sort_order,
+    } = query
+
+    let queryBuilder = supabase.from('articles').select(
+      `
         *,
         author:profiles(id, name, email, avatar_url),
         article_tags(tag:tags(id, name, slug, color)),
         article_categories(category:categories(id, name, slug, description))
-      `, { count: 'exact' })
+      `,
+      { count: 'exact' }
+    )
 
     // Apply filters
     if (status) {
       queryBuilder = queryBuilder.eq('status', status)
     }
-    
+
     if (author_id) {
       queryBuilder = queryBuilder.eq('author_id', author_id)
     }
-    
+
     if (tag) {
       queryBuilder = queryBuilder.contains('article_tags.tag.slug', [tag])
     }
-    
+
     if (category) {
-      queryBuilder = queryBuilder.contains('article_categories.category.slug', [category])
+      queryBuilder = queryBuilder.contains('article_categories.category.slug', [
+        category,
+      ])
     }
-    
+
     if (search) {
-      queryBuilder = queryBuilder.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%`)
+      queryBuilder = queryBuilder.or(
+        `title.ilike.%${search}%,excerpt.ilike.%${search}%`
+      )
     }
 
     // Apply sorting
-    queryBuilder = queryBuilder.order(sort_by, { ascending: sort_order === 'asc' })
+    queryBuilder = queryBuilder.order(sort_by, {
+      ascending: sort_order === 'asc',
+    })
 
     // Apply pagination
     const offset = (page - 1) * limit
@@ -82,10 +114,11 @@ export const articlesService = {
   // Get single article by slug
   async getArticleBySlug(slug: string) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('articles')
-      .select(`
+      .select(
+        `
         *,
         author:profiles(id, name, email, avatar_url),
         article_tags(tag:tags(id, name, slug, color)),
@@ -99,7 +132,8 @@ export const articlesService = {
           created_at,
           updated_at
         )
-      `)
+      `
+      )
       .eq('slug', slug)
       .eq('status', 'published')
       .single()
@@ -117,15 +151,17 @@ export const articlesService = {
   // Get single article by ID
   async getArticleById(id: string) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('articles')
-      .select(`
+      .select(
+        `
         *,
         author:profiles(id, name, email, avatar_url),
         article_tags(tag:tags(id, name, slug, color)),
         article_categories(category:categories(id, name, slug, description))
-      `)
+      `
+      )
       .eq('id', id)
       .single()
 
@@ -140,9 +176,13 @@ export const articlesService = {
   },
 
   // Create new article
-  async createArticle(input: ArticleInput, tags?: string[], categories?: string[]) {
+  async createArticle(
+    input: ArticleInput,
+    tags?: string[],
+    categories?: string[]
+  ) {
     const supabase = getSupabaseClient()
-    
+
     // Generate unique slug if needed
     let slug = input.slug
     if (!slug) {
@@ -192,21 +232,31 @@ export const articlesService = {
   },
 
   // Update article
-  async updateArticle(id: string, input: ArticleUpdateInput, tags?: string[], categories?: string[]) {
+  async updateArticle(
+    id: string,
+    input: ArticleUpdateInput,
+    tags?: string[],
+    categories?: string[]
+  ) {
     const supabase = getSupabaseClient()
-    
-    const updateData: Partial<ArticleUpdate> = { 
-  ...input,
-  // Convert content to string if it's an object
-  ...(input.content && { content: JSON.stringify(input.content) })
-}
+
+    const updateData: any = {
+      ...input,
+      // Convert content to string if it's an object
+      ...(input.content && {
+        content:
+          typeof input.content === 'string'
+            ? input.content
+            : JSON.stringify(input.content),
+      }),
+    }
 
     // Recalculate read time if content changed
     if (input.content) {
       if (!validateTiptapJSON(input.content)) {
         throw new Error('Invalid content format')
       }
-      
+
       const plainText = extractPlainText(input.content)
       updateData.read_time_minutes = calculateReadTime(plainText)
     }
@@ -244,11 +294,8 @@ export const articlesService = {
   // Delete article
   async deleteArticle(id: string) {
     const supabase = getSupabaseClient()
-    
-    const { error } = await supabase
-      .from('articles')
-      .delete()
-      .eq('id', id)
+
+    const { error } = await supabase.from('articles').delete().eq('id', id)
 
     if (error) {
       throw new Error(`Failed to delete article: ${error.message}`)
@@ -260,9 +307,9 @@ export const articlesService = {
   // Increment view count
   async incrementViewCount(articleId: string) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase.rpc('increment_view_count', {
-      article_id: articleId
+      article_id: articleId,
     })
 
     if (error) {
@@ -278,14 +325,16 @@ export const articlesService = {
       }
 
       const newViewCount = article.view_count + 1
-      
+
       const { error: updateError } = await supabase
         .from('articles')
         .update({ view_count: newViewCount })
         .eq('id', articleId)
 
       if (updateError) {
-        throw new Error(`Failed to increment view count: ${updateError.message}`)
+        throw new Error(
+          `Failed to increment view count: ${updateError.message}`
+        )
       }
 
       return { view_count: newViewCount }
@@ -297,7 +346,7 @@ export const articlesService = {
   // Get article stats
   async getArticleStats(articleId: string) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('article_stats')
       .select('*')
@@ -314,9 +363,9 @@ export const articlesService = {
   // Helper methods
   async getExistingSlugs(excludeId?: string) {
     const supabase = getSupabaseClient()
-    
+
     let query = supabase.from('articles').select('slug')
-    
+
     if (excludeId) {
       query = query.neq('id', excludeId)
     }
@@ -327,20 +376,18 @@ export const articlesService = {
       throw new Error(`Failed to fetch existing slugs: ${error.message}`)
     }
 
-    return data?.map(article => article.slug) || []
+    return data?.map((article) => article.slug) || []
   },
 
   async attachTagsToArticle(articleId: string, tagIds: string[]) {
     const supabase = getSupabaseClient()
-    
-    const relations = tagIds.map(tagId => ({
+
+    const relations = tagIds.map((tagId) => ({
       article_id: articleId,
       tag_id: tagId,
     }))
 
-    const { error } = await supabase
-      .from('article_tags')
-      .insert(relations)
+    const { error } = await supabase.from('article_tags').insert(relations)
 
     if (error) {
       throw new Error(`Failed to attach tags: ${error.message}`)
@@ -349,8 +396,8 @@ export const articlesService = {
 
   async attachCategoriesToArticle(articleId: string, categoryIds: string[]) {
     const supabase = getSupabaseClient()
-    
-    const relations = categoryIds.map(categoryId => ({
+
+    const relations = categoryIds.map((categoryId) => ({
       article_id: articleId,
       category_id: categoryId,
     }))
@@ -366,7 +413,7 @@ export const articlesService = {
 
   async updateArticleTags(articleId: string, tagIds: string[]) {
     const supabase = getSupabaseClient()
-    
+
     // Remove existing tags
     const { error: deleteError } = await supabase
       .from('article_tags')
@@ -385,7 +432,7 @@ export const articlesService = {
 
   async updateArticleCategories(articleId: string, categoryIds: string[]) {
     const supabase = getSupabaseClient()
-    
+
     // Remove existing categories
     const { error: deleteError } = await supabase
       .from('article_categories')
@@ -393,7 +440,9 @@ export const articlesService = {
       .eq('article_id', articleId)
 
     if (deleteError) {
-      throw new Error(`Failed to remove existing categories: ${deleteError.message}`)
+      throw new Error(
+        `Failed to remove existing categories: ${deleteError.message}`
+      )
     }
 
     // Attach new categories
@@ -407,28 +456,32 @@ export const articlesService = {
 export const tagsService = {
   async getAllTags() {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('tags')
-      .select(`
+      .select(
+        `
         *,
         article_tags(count)
-      `)
+      `
+      )
       .order('name')
 
     if (error) {
       throw new Error(`Failed to fetch tags: ${error.message}`)
     }
 
-    return data?.map(tag => ({
-      ...tag,
-      article_count: tag.article_tags?.[0]?.count || 0,
-    })) || []
+    return (
+      data?.map((tag) => ({
+        ...tag,
+        article_count: tag.article_tags?.[0]?.count || 0,
+      })) || []
+    )
   },
 
   async getTagBySlug(slug: string) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('tags')
       .select('*')
@@ -447,7 +500,7 @@ export const tagsService = {
 
   async createTag(input: TagInput) {
     const supabase = getSupabaseClient()
-    
+
     // Generate slug if not provided
     let slug = input.slug
     if (!slug) {
@@ -471,7 +524,7 @@ export const tagsService = {
 
   async updateTag(id: string, input: Partial<TagInput>) {
     const supabase = getSupabaseClient()
-    
+
     const updateData: Partial<TagInput> = { ...input }
 
     // Generate new slug if name changed and no slug provided
@@ -495,11 +548,8 @@ export const tagsService = {
 
   async deleteTag(id: string) {
     const supabase = getSupabaseClient()
-    
-    const { error } = await supabase
-      .from('tags')
-      .delete()
-      .eq('id', id)
+
+    const { error } = await supabase.from('tags').delete().eq('id', id)
 
     if (error) {
       throw new Error(`Failed to delete tag: ${error.message}`)
@@ -513,15 +563,17 @@ export const tagsService = {
 export const categoriesService = {
   async getAllCategories() {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('categories')
-      .select(`
+      .select(
+        `
         *,
         parent:categories(id, name, slug),
         children:categories(id, name, slug),
         article_categories(count)
-      `)
+      `
+      )
       .is('parent_id', null)
       .order('name')
 
@@ -529,22 +581,26 @@ export const categoriesService = {
       throw new Error(`Failed to fetch categories: ${error.message}`)
     }
 
-    return data?.map(category => ({
-      ...category,
-      article_count: category.article_categories?.[0]?.count || 0,
-    })) || []
+    return (
+      data?.map((category) => ({
+        ...category,
+        article_count: category.article_categories?.[0]?.count || 0,
+      })) || []
+    )
   },
 
   async getCategoryBySlug(slug: string) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('categories')
-      .select(`
+      .select(
+        `
         *,
         parent:categories(id, name, slug),
         children:categories(id, name, slug)
-      `)
+      `
+      )
       .eq('slug', slug)
       .single()
 
@@ -560,7 +616,7 @@ export const categoriesService = {
 
   async createCategory(input: CategoryInput) {
     const supabase = getSupabaseClient()
-    
+
     // Generate slug if not provided
     let slug = input.slug
     if (!slug) {
@@ -584,7 +640,7 @@ export const categoriesService = {
 
   async updateCategory(id: string, input: Partial<CategoryInput>) {
     const supabase = getSupabaseClient()
-    
+
     const updateData: Partial<CategoryInput> = { ...input }
 
     // Generate new slug if name changed and no slug provided
@@ -608,11 +664,8 @@ export const categoriesService = {
 
   async deleteCategory(id: string) {
     const supabase = getSupabaseClient()
-    
-    const { error } = await supabase
-      .from('categories')
-      .delete()
-      .eq('id', id)
+
+    const { error } = await supabase.from('categories').delete().eq('id', id)
 
     if (error) {
       throw new Error(`Failed to delete category: ${error.message}`)
@@ -624,12 +677,16 @@ export const categoriesService = {
 
 // Comments CRUD operations
 export const commentsService = {
-  async getCommentsByArticleId(articleId: string, status: 'approved' | 'pending' | 'rejected' = 'approved') {
+  async getCommentsByArticleId(
+    articleId: string,
+    status: 'approved' | 'pending' | 'rejected' = 'approved'
+  ) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('comments')
-      .select(`
+      .select(
+        `
         *,
         author:profiles(id, name, email, avatar_url),
         parent:comments(id, content),
@@ -639,7 +696,8 @@ export const commentsService = {
           author:profiles(id, name, email, avatar_url),
           created_at
         )
-      `)
+      `
+      )
       .eq('article_id', articleId)
       .eq('status', status)
       .is('parent_id', null)
@@ -654,14 +712,16 @@ export const commentsService = {
 
   async createComment(input: CommentInput) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('comments')
       .insert(input)
-      .select(`
+      .select(
+        `
         *,
         author:profiles(id, name, email, avatar_url)
-      `)
+      `
+      )
       .single()
 
     if (error) {
@@ -673,7 +733,7 @@ export const commentsService = {
 
   async updateComment(id: string, input: Partial<CommentInput>) {
     const supabase = getSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('comments')
       .update(input)
@@ -690,11 +750,8 @@ export const commentsService = {
 
   async deleteComment(id: string) {
     const supabase = getSupabaseClient()
-    
-    const { error } = await supabase
-      .from('comments')
-      .delete()
-      .eq('id', id)
+
+    const { error } = await supabase.from('comments').delete().eq('id', id)
 
     if (error) {
       throw new Error(`Failed to delete comment: ${error.message}`)

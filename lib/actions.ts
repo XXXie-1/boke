@@ -1,8 +1,19 @@
 'use server'
 
 import { revalidateTag } from 'next/cache'
-import { articlesService, tagsService, categoriesService, commentsService } from './articles'
-import { ArticleInputSchema, ArticleUpdateInputSchema, TagInputSchema, CategoryInputSchema, CommentInputSchema } from './schemas'
+import {
+  articlesService,
+  tagsService,
+  categoriesService,
+  commentsService,
+} from './articles'
+import {
+  ArticleInputSchema,
+  ArticleUpdateInputSchema,
+  TagInputSchema,
+  CategoryInputSchema,
+  CommentInputSchema,
+} from './schemas'
 import { z } from 'zod'
 
 // Article Actions
@@ -24,14 +35,22 @@ export async function getArticleBySlug(slug: string) {
   }
 }
 
-export async function createArticle(data: any, tags?: string[], categories?: string[]) {
+export async function createArticle(
+  data: any,
+  tags?: string[],
+  categories?: string[]
+) {
   try {
     const articleData = ArticleInputSchema.parse(data)
-    const result = await articlesService.createArticle(articleData, tags, categories)
-    
+    const result = await articlesService.createArticle(
+      articleData,
+      tags,
+      categories
+    )
+
     // Revalidate cache
     revalidateTag('articles')
-    
+
     return result
   } catch (error) {
     console.error('Error creating article:', error)
@@ -39,18 +58,28 @@ export async function createArticle(data: any, tags?: string[], categories?: str
   }
 }
 
-export async function updateArticle(slug: string, data: any, tags?: string[], categories?: string[]) {
+export async function updateArticle(
+  slug: string,
+  data: any,
+  tags?: string[],
+  categories?: string[]
+) {
   try {
     // Get article by slug to get ID
     const existingArticle = await articlesService.getArticleBySlug(slug)
-    
+
     const updateData = ArticleUpdateInputSchema.parse(data)
-    const result = await articlesService.updateArticle(existingArticle.id, updateData, tags, categories)
-    
+    const result = await articlesService.updateArticle(
+      existingArticle.id,
+      updateData,
+      tags,
+      categories
+    )
+
     // Revalidate cache
     revalidateTag('articles')
     revalidateTag(`article:${slug}`)
-    
+
     return result
   } catch (error) {
     console.error('Error updating article:', error)
@@ -62,13 +91,13 @@ export async function deleteArticle(slug: string) {
   try {
     // Get article by slug to get ID
     const existingArticle = await articlesService.getArticleBySlug(slug)
-    
+
     await articlesService.deleteArticle(existingArticle.id)
-    
+
     // Revalidate cache
     revalidateTag('articles')
     revalidateTag(`article:${slug}`)
-    
+
     return true
   } catch (error) {
     console.error('Error deleting article:', error)
@@ -80,13 +109,13 @@ export async function incrementArticleViewCount(slug: string) {
   try {
     // Get article by slug to get ID
     const article = await articlesService.getArticleBySlug(slug)
-    
+
     const result = await articlesService.incrementViewCount(article.id)
-    
+
     // Revalidate cache
     revalidateTag(`article:${slug}`)
     revalidateTag('article-views')
-    
+
     return result
   } catch (error) {
     console.error('Error incrementing view count:', error)
@@ -117,10 +146,10 @@ export async function createTag(data: any) {
   try {
     const tagData = TagInputSchema.parse(data)
     const result = await tagsService.createTag(tagData)
-    
+
     // Revalidate cache
     revalidateTag('tags')
-    
+
     return result
   } catch (error) {
     console.error('Error creating tag:', error)
@@ -151,10 +180,10 @@ export async function createCategory(data: any) {
   try {
     const categoryData = CategoryInputSchema.parse(data)
     const result = await categoriesService.createCategory(categoryData)
-    
+
     // Revalidate cache
     revalidateTag('categories')
-    
+
     return result
   } catch (error) {
     console.error('Error creating category:', error)
@@ -163,7 +192,10 @@ export async function createCategory(data: any) {
 }
 
 // Comment Actions
-export async function getCommentsByArticleId(articleId: string, status: 'approved' | 'pending' | 'rejected' = 'approved') {
+export async function getCommentsByArticleId(
+  articleId: string,
+  status: 'approved' | 'pending' | 'rejected' = 'approved'
+) {
   try {
     return await commentsService.getCommentsByArticleId(articleId, status)
   } catch (error) {
@@ -176,11 +208,11 @@ export async function createComment(data: any) {
   try {
     const commentData = CommentInputSchema.parse(data)
     const result = await commentsService.createComment(commentData)
-    
+
     // Revalidate cache
     revalidateTag('comments')
     revalidateTag(`article:${commentData.article_id}`)
-    
+
     return result
   } catch (error) {
     console.error('Error creating comment:', error)
@@ -196,7 +228,7 @@ export async function prefetchArticleData(slug: string) {
       getAllTags(),
       getAllCategories(),
     ])
-    
+
     return {
       article,
       tags,
@@ -220,7 +252,7 @@ export async function prefetchArticlesList(query: any = {}) {
       getAllTags(),
       getAllCategories(),
     ])
-    
+
     return {
       articles: articlesResult,
       tags,

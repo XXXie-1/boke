@@ -7,7 +7,7 @@ import { z } from 'zod'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    
+
     // Parse and validate query parameters
     const query = ArticleQuerySchema.parse({
       page: searchParams.get('page') || '1',
@@ -29,9 +29,18 @@ export async function GET(request: NextRequest) {
       pagination: result.pagination,
     })
 
-    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
-    response.headers.set('CDN-Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
-    response.headers.set('Vercel-CDN-Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+    response.headers.set(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
+    response.headers.set(
+      'CDN-Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
+    response.headers.set(
+      'Vercel-CDN-Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
 
     // Add revalidation tags
     response.headers.set('Cache-Tag', 'articles')
@@ -39,7 +48,7 @@ export async function GET(request: NextRequest) {
     return response
   } catch (error) {
     console.error('Error fetching articles:', error)
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid query parameters', details: error.issues },
@@ -58,14 +67,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
+
     // Validate request body
     const articleData = ArticleInputSchema.parse(body)
-    
+
     const tags = body.tags || []
     const categories = body.categories || []
 
-    const result = await articlesService.createArticle(articleData, tags, categories)
+    const result = await articlesService.createArticle(
+      articleData,
+      tags,
+      categories
+    )
 
     // Revalidate cache
     const response = NextResponse.json({ data: result }, { status: 201 })
@@ -74,7 +87,7 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     console.error('Error creating article:', error)
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid article data', details: error.issues },

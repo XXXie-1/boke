@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { articlesService, tagsService, categoriesService } from '@/lib/articles'
 import { generateSlug, calculateReadTime, extractPlainText } from '@/lib/utils'
-import { ArticleInputSchema, TagInputSchema, CategoryInputSchema } from '@/lib/schemas'
+import {
+  ArticleInputSchema,
+  TagInputSchema,
+  CategoryInputSchema,
+} from '@/lib/schemas'
 
 // Mock Supabase client
 vi.mock('@/lib/supabase', () => ({
@@ -87,11 +91,9 @@ describe('Article Utilities', () => {
         content: [
           {
             type: 'paragraph',
-            content: [
-              { type: 'text', text: 'Hello world' }
-            ]
-          }
-        ]
+            content: [{ type: 'text', text: 'Hello world' }],
+          },
+        ],
       }
       const text = extractPlainText(json)
       expect(text).toBe('Hello world')

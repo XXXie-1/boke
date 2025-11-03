@@ -36,6 +36,7 @@ This document describes the comprehensive article data layer implementation for 
 ## Database Schema
 
 ### Articles Table
+
 ```sql
 CREATE TABLE articles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -55,6 +56,7 @@ CREATE TABLE articles (
 ```
 
 ### Tags Table
+
 ```sql
 CREATE TABLE tags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -67,6 +69,7 @@ CREATE TABLE tags (
 ```
 
 ### Categories Table
+
 ```sql
 CREATE TABLE categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -80,6 +83,7 @@ CREATE TABLE categories (
 ```
 
 ### Comments Table
+
 ```sql
 CREATE TABLE comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -94,6 +98,7 @@ CREATE TABLE comments (
 ```
 
 ### Junction Tables
+
 ```sql
 CREATE TABLE article_tags (
   article_id UUID REFERENCES articles(id) ON DELETE CASCADE NOT NULL,
@@ -111,6 +116,7 @@ CREATE TABLE article_categories (
 ## API Endpoints
 
 ### Articles
+
 - `GET /api/articles` - List articles with pagination and filtering
 - `POST /api/articles` - Create new article
 - `GET /api/articles/[slug]` - Get single article by slug
@@ -119,22 +125,26 @@ CREATE TABLE article_categories (
 - `POST /api/articles/[slug]/view` - Increment view count
 
 ### Tags
+
 - `GET /api/tags` - List all tags with article counts
 - `POST /api/tags` - Create new tag
 - `GET /api/tags/[slug]` - Get single tag by slug
 
 ### Categories
+
 - `GET /api/categories` - List all categories with article counts
 - `POST /api/categories` - Create new category
 - `GET /api/categories/[slug]` - Get single category by slug
 
 ### Comments
+
 - `GET /api/comments` - Get comments by article ID
 - `POST /api/comments` - Create new comment
 
 ## Caching Strategy
 
 ### Cache Headers
+
 All API responses include appropriate cache headers:
 
 - **Articles list**: 5 minutes (s-maxage=300)
@@ -144,6 +154,7 @@ All API responses include appropriate cache headers:
 - **View counts**: 5 minutes (s-maxage=300)
 
 ### Revalidation Tags
+
 Cache invalidation uses Next.js revalidation tags:
 
 - `articles` - All article-related data
@@ -156,6 +167,7 @@ Cache invalidation uses Next.js revalidation tags:
 - `article-views` - View count data
 
 ### Server Actions Revalidation
+
 Server Actions automatically revalidate relevant cache tags:
 
 ```typescript
@@ -174,6 +186,7 @@ revalidateTag('article-views')
 ## Usage Examples
 
 ### Client-side with Server Actions
+
 ```typescript
 import { createArticle, getArticles } from '@/lib/actions'
 
@@ -194,22 +207,24 @@ const newArticle = await createArticle({
 ```
 
 ### Server-side API calls
+
 ```typescript
 // API Route Handler
 import { articlesService } from '@/lib/articles'
 
 export async function GET(request: NextRequest) {
   const result = await articlesService.getArticles(query)
-  
+
   const response = NextResponse.json(result)
   response.headers.set('Cache-Control', 'public, s-maxage=300')
   response.headers.set('Cache-Tag', 'articles')
-  
+
   return response
 }
 ```
 
 ### Direct service usage
+
 ```typescript
 import { articlesService } from '@/lib/articles'
 
@@ -227,6 +242,7 @@ const article = await articlesService.createArticle(
 ## Content Handling
 
 ### Tiptap JSON Format
+
 Articles use Tiptap JSON format for rich content:
 
 ```typescript
@@ -235,15 +251,14 @@ const content = {
   content: [
     {
       type: 'paragraph',
-      content: [
-        { type: 'text', text: 'Hello world!' }
-      ]
-    }
-  ]
+      content: [{ type: 'text', text: 'Hello world!' }],
+    },
+  ],
 }
 ```
 
 ### Markdown Conversion
+
 ```typescript
 import { markdownToTiptapJSON, tiptapJSONToMarkdown } from '@/lib/utils'
 
@@ -255,6 +270,7 @@ const markdown = tiptapJSONToMarkdown(json)
 ```
 
 ### Slug Generation
+
 ```typescript
 import { generateSlug } from '@/lib/utils'
 
@@ -264,6 +280,7 @@ const slug = generateSlug('My Article Title', ['existing-slug'])
 ```
 
 ### Read Time Calculation
+
 ```typescript
 import { calculateReadTime, extractPlainText } from '@/lib/utils'
 
@@ -275,6 +292,7 @@ const readTime = calculateReadTime(plainText)
 ## Error Handling
 
 ### Validation Errors
+
 All inputs are validated using Zod schemas:
 
 ```typescript
@@ -291,6 +309,7 @@ try {
 ```
 
 ### Database Errors
+
 Service methods throw descriptive errors:
 
 ```typescript
@@ -307,7 +326,9 @@ try {
 ## Testing
 
 ### Unit Tests
+
 Tests cover:
+
 - Slug generation uniqueness
 - Read time calculation accuracy
 - Content serialization
@@ -315,12 +336,13 @@ Tests cover:
 - Error handling
 
 ### Test Structure
+
 ```typescript
 describe('generateSlug', () => {
   it('should generate slug from text', () => {
     expect(generateSlug('Hello World!')).toBe('hello-world')
   })
-  
+
   it('should ensure uniqueness', () => {
     const slug = generateSlug('Hello', ['hello'])
     expect(slug).toBe('hello-2')
@@ -331,6 +353,7 @@ describe('generateSlug', () => {
 ## Performance Considerations
 
 ### Database Indexes
+
 Recommended indexes for optimal performance:
 
 ```sql
@@ -360,6 +383,7 @@ CREATE INDEX idx_article_categories_category ON article_categories(category_id);
 ```
 
 ### Query Optimization
+
 - Use specific column selection instead of `SELECT *`
 - Implement proper pagination with `LIMIT` and `OFFSET`
 - Use database functions for complex operations (view count increment)
@@ -368,16 +392,19 @@ CREATE INDEX idx_article_categories_category ON article_categories(category_id);
 ## Security Considerations
 
 ### Input Validation
+
 - All inputs validated with Zod schemas
 - SQL injection prevention through parameterized queries
 - Content sanitization for user-generated content
 
 ### Authorization
+
 - Server-side permission checks
 - Row-level security policies in Supabase
 - Rate limiting for API endpoints
 
 ### Data Privacy
+
 - PII handling compliance
 - Secure file upload for featured images
 - Comment moderation workflow
@@ -385,6 +412,7 @@ CREATE INDEX idx_article_categories_category ON article_categories(category_id);
 ## Deployment Notes
 
 ### Environment Variables
+
 Required environment variables:
 
 ```bash
@@ -394,6 +422,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
 ### Database Migration
+
 Run migrations in order:
 
 1. Create base tables
@@ -402,6 +431,7 @@ Run migrations in order:
 4. Set up RLS policies
 
 ### Monitoring
+
 - Monitor API response times
 - Track cache hit rates
 - Log database query performance

@@ -4,7 +4,10 @@ import { generateJSON } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 
 // Slug generation
-export const generateSlug = (text: string, existingSlugs: string[] = []): string => {
+export const generateSlug = (
+  text: string,
+  existingSlugs: string[] = []
+): string => {
   const baseSlug = slugify(text, {
     lower: true,
     strict: true,
@@ -35,9 +38,7 @@ export const calculateReadTime = (content: string): number => {
 
 // Tiptap JSON serialization
 export const markdownToTiptapJSON = (markdown: string) => {
-  const extensions = [
-    StarterKit,
-  ]
+  const extensions = [StarterKit]
 
   return generateJSON(markdown, extensions)
 }
@@ -55,11 +56,11 @@ const extractTextFromJSON = (node: any): string => {
   if (node.type === 'text') {
     return node.text || ''
   }
-  
+
   if (node.content && Array.isArray(node.content)) {
     return node.content.map(extractTextFromJSON).join('')
   }
-  
+
   return ''
 }
 
@@ -68,7 +69,7 @@ export const extractPlainText = (json: any): string => {
   if (!json || typeof json !== 'object') {
     return ''
   }
-  
+
   return extractTextFromJSON(json)
 }
 
@@ -77,15 +78,15 @@ export const validateTiptapJSON = (json: any): boolean => {
   if (!json || typeof json !== 'object') {
     return false
   }
-  
+
   if (json.type !== 'doc') {
     return false
   }
-  
+
   if (!Array.isArray(json.content)) {
     return false
   }
-  
+
   return true
 }
 
@@ -112,11 +113,15 @@ export const formatDateFromAPI = (dateString: string): Date => {
 }
 
 // Pagination utilities
-export const calculatePagination = (page: number, limit: number, total: number) => {
+export const calculatePagination = (
+  page: number,
+  limit: number,
+  total: number
+) => {
   const totalPages = Math.ceil(total / limit)
   const hasNextPage = page < totalPages
   const hasPrevPage = page > 1
-  
+
   return {
     page,
     limit,
@@ -138,10 +143,13 @@ export const groupBy = <T, K extends keyof any>(
   array: T[],
   key: (item: T) => K
 ): Record<K, T[]> => {
-  return array.reduce((groups, item) => {
-    const groupKey = key(item)
-    groups[groupKey] = groups[groupKey] || []
-    groups[groupKey].push(item)
-    return groups
-  }, {} as Record<K, T[]>)
+  return array.reduce(
+    (groups, item) => {
+      const groupKey = key(item)
+      groups[groupKey] = groups[groupKey] || []
+      groups[groupKey].push(item)
+      return groups
+    },
+    {} as Record<K, T[]>
+  )
 }

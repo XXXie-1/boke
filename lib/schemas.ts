@@ -1,10 +1,14 @@
 import { z } from 'zod'
 
 // Base schemas
-export const SlugSchema = z.string()
+export const SlugSchema = z
+  .string()
   .min(1, 'Slug is required')
   .max(100, 'Slug must be less than 100 characters')
-  .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens')
+  .regex(
+    /^[a-z0-9-]+$/,
+    'Slug must contain only lowercase letters, numbers, and hyphens'
+  )
 
 export const ContentSchema = z.object({
   type: z.literal('doc'),
@@ -13,11 +17,20 @@ export const ContentSchema = z.object({
 
 // Article schemas
 export const ArticleBaseSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(200, 'Title must be less than 200 characters'),
   slug: SlugSchema,
   content: ContentSchema,
-  excerpt: z.string().max(500, 'Excerpt must be less than 500 characters').optional(),
-  featured_image: z.string().url('Featured image must be a valid URL').optional(),
+  excerpt: z
+    .string()
+    .max(500, 'Excerpt must be less than 500 characters')
+    .optional(),
+  featured_image: z
+    .string()
+    .url('Featured image must be a valid URL')
+    .optional(),
   status: z.enum(['draft', 'published', 'archived']),
 })
 
@@ -37,15 +50,23 @@ export const ArticleQuerySchema = z.object({
   tag: z.string().optional(),
   category: z.string().optional(),
   search: z.string().optional(),
-  sort_by: z.enum(['created_at', 'updated_at', 'published_at', 'title', 'view_count']).default('created_at'),
+  sort_by: z
+    .enum(['created_at', 'updated_at', 'published_at', 'title', 'view_count'])
+    .default('created_at'),
   sort_order: z.enum(['asc', 'desc']).default('desc'),
 })
 
 // Tag schemas
 export const TagBaseSchema = z.object({
-  name: z.string().min(1, 'Tag name is required').max(50, 'Tag name must be less than 50 characters'),
+  name: z
+    .string()
+    .min(1, 'Tag name is required')
+    .max(50, 'Tag name must be less than 50 characters'),
   slug: SlugSchema,
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color').optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color')
+    .optional(),
 })
 
 export const TagInsertSchema = TagBaseSchema
@@ -54,9 +75,15 @@ export const TagUpdateSchema = TagBaseSchema.partial()
 
 // Category schemas
 export const CategoryBaseSchema = z.object({
-  name: z.string().min(1, 'Category name is required').max(50, 'Category name must be less than 50 characters'),
+  name: z
+    .string()
+    .min(1, 'Category name is required')
+    .max(50, 'Category name must be less than 50 characters'),
   slug: SlugSchema,
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+  description: z
+    .string()
+    .max(500, 'Description must be less than 500 characters')
+    .optional(),
   parent_id: z.string().uuid().optional(),
 })
 
@@ -67,15 +94,37 @@ export const CategoryUpdateSchema = CategoryBaseSchema.partial()
 // Comment schemas
 export const CommentBaseSchema = z.object({
   article_id: z.string().uuid('Invalid article ID'),
-  author_id: z.string().uuid('Invalid author ID'),
-  content: z.string().min(1, 'Comment content is required').max(2000, 'Comment must be less than 2000 characters'),
+  nickname: z
+    .string()
+    .min(2, 'Nickname must be at least 2 characters')
+    .max(20, 'Nickname must be less than 20 characters'),
+  content: z
+    .string()
+    .min(1, 'Comment content is required')
+    .max(1000, 'Comment must be less than 1000 characters'),
   parent_id: z.string().uuid('Invalid parent comment ID').optional(),
   status: z.enum(['pending', 'approved', 'rejected']).default('pending'),
 })
 
-export const CommentInsertSchema = CommentBaseSchema
+export const CommentInsertSchema = CommentBaseSchema.omit({ status: true })
 
-export const CommentUpdateSchema = CommentBaseSchema.partial()
+export const CommentUpdateSchema = CommentBaseSchema.partial().omit({
+  article_id: true,
+  nickname: true,
+})
+
+// Comment moderation schemas
+export const CommentModerationSchema = z.object({
+  status: z.enum(['approved', 'rejected']),
+  moderation_reason: z.string().optional(),
+})
+
+export const CommentQuerySchema = z.object({
+  article_id: z.string().uuid('Invalid article ID'),
+  status: z.enum(['approved', 'pending', 'rejected']).default('approved'),
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(50),
+})
 
 // Article-Tag relationship schemas
 export const ArticleTagSchema = z.object({
@@ -104,6 +153,8 @@ export type CategoryInput = z.infer<typeof CategoryInsertSchema>
 export type CategoryUpdateInput = z.infer<typeof CategoryUpdateSchema>
 export type CommentInput = z.infer<typeof CommentInsertSchema>
 export type CommentUpdateInput = z.infer<typeof CommentUpdateSchema>
+export type CommentModerationInput = z.infer<typeof CommentModerationSchema>
+export type CommentQueryInput = z.infer<typeof CommentQuerySchema>
 export type ArticleTagInput = z.infer<typeof ArticleTagSchema>
 export type ArticleCategoryInput = z.infer<typeof ArticleCategorySchema>
 export type ViewCountInput = z.infer<typeof ViewCountSchema>

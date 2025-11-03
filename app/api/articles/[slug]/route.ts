@@ -12,32 +12,35 @@ export async function GET(
     const { slug } = params
 
     if (!slug) {
-      return NextResponse.json(
-        { error: 'Slug is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
     }
 
     const article = await articlesService.getArticleBySlug(slug)
 
     // Cache response for 1 hour
     const response = NextResponse.json({ data: article })
-    response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200')
-    response.headers.set('CDN-Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200')
-    response.headers.set('Vercel-CDN-Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200')
-    
+    response.headers.set(
+      'Cache-Control',
+      'public, s-maxage=3600, stale-while-revalidate=7200'
+    )
+    response.headers.set(
+      'CDN-Cache-Control',
+      'public, s-maxage=3600, stale-while-revalidate=7200'
+    )
+    response.headers.set(
+      'Vercel-CDN-Cache-Control',
+      'public, s-maxage=3600, stale-while-revalidate=7200'
+    )
+
     // Add specific revalidation tags
     response.headers.set('Cache-Tag', `article:${slug},articles`)
 
     return response
   } catch (error) {
     console.error('Error fetching article:', error)
-    
+
     if (error instanceof Error && error.message === 'Article not found') {
-      return NextResponse.json(
-        { error: 'Article not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
     return NextResponse.json(
@@ -57,10 +60,7 @@ export async function PUT(
     const body = await request.json()
 
     if (!slug) {
-      return NextResponse.json(
-        { error: 'Slug is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
     }
 
     // First get the article by slug to get the ID
@@ -68,9 +68,10 @@ export async function PUT(
 
     // Validate request body
     const updateData = ArticleUpdateInputSchema.parse(body)
-    
+
     const tags = body.tags !== undefined ? body.tags : undefined
-    const categories = body.categories !== undefined ? body.categories : undefined
+    const categories =
+      body.categories !== undefined ? body.categories : undefined
 
     const result = await articlesService.updateArticle(
       existingArticle.id,
@@ -86,12 +87,9 @@ export async function PUT(
     return response
   } catch (error) {
     console.error('Error updating article:', error)
-    
+
     if (error instanceof Error && error.message === 'Article not found') {
-      return NextResponse.json(
-        { error: 'Article not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
     if (error instanceof z.ZodError) {
@@ -117,10 +115,7 @@ export async function DELETE(
     const { slug } = params
 
     if (!slug) {
-      return NextResponse.json(
-        { error: 'Slug is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
     }
 
     // First get the article by slug to get the ID
@@ -135,12 +130,9 @@ export async function DELETE(
     return response
   } catch (error) {
     console.error('Error deleting article:', error)
-    
+
     if (error instanceof Error && error.message === 'Article not found') {
-      return NextResponse.json(
-        { error: 'Article not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
     return NextResponse.json(

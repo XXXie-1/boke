@@ -10,27 +10,24 @@ export async function GET(
     const { slug } = params
 
     if (!slug) {
-      return NextResponse.json(
-        { error: 'Slug is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
     }
 
     const category = await categoriesService.getCategoryBySlug(slug)
 
     const response = NextResponse.json({ data: category })
-    response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200')
+    response.headers.set(
+      'Cache-Control',
+      'public, s-maxage=3600, stale-while-revalidate=7200'
+    )
     response.headers.set('Cache-Tag', `category:${slug},categories`)
 
     return response
   } catch (error) {
     console.error('Error fetching category:', error)
-    
+
     if (error instanceof Error && error.message === 'Category not found') {
-      return NextResponse.json(
-        { error: 'Category not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Category not found' }, { status: 404 })
     }
 
     return NextResponse.json(
