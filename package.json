@@ -17,11 +17,13 @@
     "bundle:analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@next/bundle-analyzer": "^16.0.1",
     "@supabase/supabase-js": "^2.78.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/jest": "^30.0.0",
+    "date-fns": "^4.1.0",
     "eslint-plugin-security": "^3.0.1",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",

@@ -52,19 +52,108 @@ export function createServerSupabaseClient() {
 export interface Database {
   public: {
     Tables: {
-      // Define your table types here
-      // Example:
-      // users: {
-      //   Row: { id: string; email: string; created_at: string; }
-      //   Insert: { email: string; }
-      //   Update: { email?: string; }
-      // }
+      articles: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          content: string
+          excerpt?: string
+          featured_image?: string
+          author_id: string
+          status: 'draft' | 'published' | 'archived'
+          published_at?: string
+          view_count: number
+          read_time_minutes?: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['articles']['Row'], 'id' | 'created_at' | 'updated_at' | 'view_count'>
+        Update: Partial<Database['public']['Tables']['articles']['Row']>
+      }
+      tags: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          color?: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['tags']['Row'], 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Database['public']['Tables']['tags']['Row']>
+      }
+      categories: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description?: string
+          parent_id?: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['categories']['Row'], 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Database['public']['Tables']['categories']['Row']>
+      }
+      article_tags: {
+        Row: {
+          article_id: string
+          tag_id: string
+        }
+        Insert: Database['public']['Tables']['article_tags']['Row']
+        Update: Partial<Database['public']['Tables']['article_tags']['Row']>
+      }
+      article_categories: {
+        Row: {
+          article_id: string
+          category_id: string
+        }
+        Insert: Database['public']['Tables']['article_categories']['Row']
+        Update: Partial<Database['public']['Tables']['article_categories']['Row']>
+      }
+      reading_history: {
+        Row: {
+          id: string
+          user_id: string
+          article_id: string
+          read_at: string
+          read_percentage?: number
+        }
+        Insert: Omit<Database['public']['Tables']['reading_history']['Row'], 'id' | 'read_at'>
+        Update: Partial<Database['public']['Tables']['reading_history']['Row']>
+      }
     };
     Views: {
-      [_ in never]: never;
+      article_stats: {
+        Row: {
+          article_id: string
+          title: string
+          slug: string
+          view_count: number
+          comment_count: number
+          tag_count: number
+          category_count: number
+          published_at: string
+        }
+      }
     };
     Functions: {
-      [_ in never]: never;
+      search_articles: {
+        Args: {
+          query: string
+          limit?: number
+          offset?: number
+        }
+        Returns: Database['public']['Tables']['articles']['Row'][]
+      }
+      get_related_articles: {
+        Args: {
+          article_id: string
+          limit?: number
+        }
+        Returns: Database['public']['Tables']['articles']['Row'][]
+      }
     };
     Enums: {
       [_ in never]: never;
@@ -286,3 +375,14 @@ export const supabaseUtils = {
     });
   }
 };
+
+// Export types for convenience
+export type Article = Database['public']['Tables']['articles']['Row']
+export type ArticleInsert = Database['public']['Tables']['articles']['Insert']
+export type ArticleUpdate = Database['public']['Tables']['articles']['Update']
+export type Tag = Database['public']['Tables']['tags']['Row']
+export type TagInsert = Database['public']['Tables']['tags']['Insert']
+export type Category = Database['public']['Tables']['categories']['Row']
+export type CategoryInsert = Database['public']['Tables']['categories']['Insert']
+export type ReadingHistory = Database['public']['Tables']['reading_history']['Row']
+export type ArticleStats = Database['public']['Views']['article_stats']['Row']
