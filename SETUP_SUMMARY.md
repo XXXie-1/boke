@@ -1,6 +1,6 @@
-# Project Setup Summary
+# boke 博客项目设置总结
 
-This repository has been configured as a complete Vercel + Supabase starter kit with the following components:
+本仓库已配置为完整的 Vercel + Supabase 博客平台，包含以下组件：
 
 ## ✅ Completed Setup
 
@@ -19,12 +19,21 @@ This repository has been configured as a complete Vercel + Supabase starter kit 
 - Protected routes middleware
 - User profile management
 
-### 🗄️ Database Setup
-- Supabase project configuration
-- Database migrations with profiles table
-- Row Level Security (RLS) policies
-- Auto user profile creation on signup
-- TypeScript type definitions
+### 🗄️ 数据库设置
+- Supabase 项目配置
+- 数据库迁移（profiles 和 posts 表）
+- 行级安全策略 (RLS)
+- 用户注册时自动创建资料
+- TypeScript 类型定义
+- 示例博客文章数据
+
+### 📝 博客功能
+- 博客首页显示文章列表
+- 文章创建和发布功能
+- 文章详情页面
+- 响应式设计
+- SEO 友好的 URL 结构
+- 文章搜索和分类（基础版）
 
 ### 🚀 Deployment Configuration
 - **Vercel configuration** (`vercel.json`) with environment variable descriptions

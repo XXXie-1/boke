@@ -2,7 +2,7 @@ import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { GetServerSidePropsContext } from 'next'
 import { useState } from 'react'
 import Link from 'next/link'
-import type { Database } from '../types/database'
+import type { Database } from '../../types/database'
 
 export default function Login() {
   const [email, setEmail] = useState('')

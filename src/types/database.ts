@@ -41,6 +41,44 @@ export interface Database {
           created_at?: string
         }
       }
+      posts: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          content: string
+          excerpt: string | null
+          author_id: string
+          published: boolean
+          created_at: string
+          updated_at: string
+          published_at: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          slug: string
+          content: string
+          excerpt?: string | null
+          author_id: string
+          published?: boolean
+          created_at?: string
+          updated_at?: string
+          published_at?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          slug?: string
+          content?: string
+          excerpt?: string | null
+          author_id?: string
+          published?: boolean
+          created_at?: string
+          updated_at?: string
+          published_at?: string | null
+        }
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,20 +1,21 @@
-# Vercel + Supabase Starter Kit
+# boke 博客
 
-A modern full-stack web application starter kit built with Next.js 14, TypeScript, and Supabase. This template provides authentication, database management, and deployment-ready configuration for Vercel.
+一个使用 Next.js 14、TypeScript 和 Supabase 构建的现代化博客平台。支持用户认证、文章管理和自动部署。
 
-## 🚀 Features
+## 🚀 特性
 
-- **Next.js 14** with App Router and TypeScript
-- **Supabase** for authentication and database
-- **Tailwind CSS** for styling (ready to add)
-- **Authentication** with email/password
-- **Database migrations** with Supabase CLI
-- **CI/CD pipeline** with GitHub Actions
-- **Vercel deployment** ready
-- **Environment variables** configuration
-- **Testing** with Jest and React Testing Library
-- **Linting** with ESLint
-- **Type checking** with TypeScript
+- **Next.js 14** 使用 App Router 和 TypeScript
+- **Supabase** 用于身份验证和数据库
+- **Tailwind CSS** 用于样式设计
+- **用户认证** 支持邮箱密码登录
+- **文章管理** 支持创建、编辑和发布博客文章
+- **数据库迁移** 使用 Supabase CLI
+- **CI/CD 流水线** 使用 GitHub Actions
+- **Vercel 部署** 开箱即用
+- **环境变量** 配置完整
+- **测试** 使用 Jest 和 React Testing Library
+- **代码检查** 使用 ESLint
+- **类型检查** 使用 TypeScript
 
 ## 📋 Prerequisites
 
@@ -76,9 +77,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to see your app.
 
-## 🗄️ Database Schema
+## 🗄️ 数据库架构
 
-The starter kit includes a `profiles` table that extends Supabase auth:
+博客系统包含以下数据表：
+
+### 用户表 (profiles)
+扩展 Supabase 认证系统的用户信息：
 
 ```sql
 CREATE TABLE public.profiles (
@@ -93,12 +97,46 @@ CREATE TABLE public.profiles (
 );
 ```
 
-## 🔐 Authentication
+### 文章表 (posts)
+存储博客文章内容：
 
-The app includes email/password authentication with the following pages:
-- `/auth/login` - Sign in page
-- `/auth/signup` - Sign up page
-- API routes at `/api/auth/` for auth operations
+```sql
+CREATE TABLE public.posts (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  title text NOT NULL,
+  slug text NOT NULL UNIQUE,
+  content text NOT NULL,
+  excerpt text,
+  author_id uuid NOT NULL REFERENCES public.profiles(id),
+  published boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  published_at timestamp with time zone
+);
+```
+
+## 🔐 认证系统
+
+应用包含邮箱密码认证功能，提供以下页面：
+- `/auth/login` - 登录页面
+- `/auth/signup` - 注册页面
+- `/api/auth/` - 认证相关的 API 路由
+
+## 📝 博客功能
+
+### 文章管理
+- `/` - 博客首页，显示已发布的文章列表
+- `/posts/create` - 创建新文章页面
+- `/posts/[slug]` - 文章详情页面
+- `/api/posts/create` - 创建文章的 API 端点
+
+### 主要特性
+- ✅ 用户注册和登录
+- ✅ 创建和发布博客文章
+- ✅ 文章列表和详情页面
+- ✅ 响应式设计，支持移动端
+- ✅ 搜索引擎友好的 URL 结构
+- ✅ 行级安全策略 (RLS) 保护数据
 
 ## 📦 Available Scripts
 
